@@ -1040,22 +1040,44 @@
         }
 
         const stepContactForm = document.getElementById('stepContactForm');
-        stepContactForm.addEventListener('submit', function(event) {
-            event.preventDefault();
-            
-            const telefonoInput = document.getElementById('stepTelefono');
-            const telefonoError = document.getElementById('telefonoError');
+       stepContactForm.addEventListener('submit', function(event) {
+    event.preventDefault();
+    
+    const telefonoInput = document.getElementById('stepTelefono');
+    const telefonoError = document.getElementById('telefonoError');
 
-            if (telefonoInput.value.length !== 10) {
-                telefonoError.style.display = 'block';
-                return;
-            } else {
-                telefonoError.style.display = 'none';
-            }
+    if (telefonoInput.value.length !== 10) {
+        telefonoError.style.display = 'block';
+        return;
+    } else {
+        telefonoError.style.display = 'none';
+    }
 
-            const nombreProspecto = document.getElementById('stepNombre').value;
-            
-            nextStep(3);
+    const nombreProspecto = document.getElementById('stepNombre').value;
+    
+    // Enviar datos a Google Sheets
+    const formData = {
+        promotora: promotoraNombre,
+        nombre: nombreProspecto,
+        email: document.getElementById('stepEmail').value,
+        telefono: document.getElementById('stepTelefono').value,
+        estado: document.getElementById('stepEstado').value,
+        programa: selectedProgram
+    };
+    
+    fetch('https://script.google.com/macros/s/AKfycbx0M_bKaxRsw7sCfVzSfXbjeahimmqZGBdgo93ldtkSpqZskbXi78qby0zLIepLyeSokg/exec', {
+        method: 'POST',
+        body: JSON.stringify(formData)
+    });
+    
+    nextStep(3);
+
+    const whatsappText = `¡Hola, ${promotoraNombre}! Me llamo ${nombreProspecto} y me interesa conocer más sobre la beca preautorizada a la que soy candidato/a para el programa de ${selectedProgram}. ¿Me podrías ayudar con la información?`;
+    const encodedText = encodeURIComponent(whatsappText);
+    const whatsappLink = `https://wa.me/${promotoraTelefono}?text=${encodedText}`;
+    
+    document.getElementById('whatsappFinalLink').href = whatsappLink;
+});
 
             const whatsappText = `¡Hola, ${promotoraNombre}! Me llamo ${nombreProspecto} y me interesa conocer más sobre la beca preautorizada a la que soy candidato/a para el programa de ${selectedProgram}. ¿Me podrías ayudar con la información?`;
             const encodedText = encodeURIComponent(whatsappText);
